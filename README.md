@@ -21,3 +21,5 @@ They are not filtered from being chosen by the random word algorithm and the spe
 Filtering the index 0 from each category would stop this behaviour. 
 As it is not mandatory to put category names in front of the string you may do so or use the space for a different word.
 
+It may be helpful to clear the SD Card before uploading the folders with V3.0 compatible sound files to avoid conflicts.
+
