@@ -1,7 +1,7 @@
 /* 
  * DIY "PARA"-METER SYSTEM (ESP32 EDITION)
- * Version 3.0 mit Hardware-Serial & ADC-Optimierung
- * Datum: 2026/03/11
+ * Version 3.01 mit Hardware-Serial & ADC-Optimierung
+ * Datum: 2026/03/13
  */
 
 #include <Arduino.h>
@@ -18,9 +18,8 @@ WordStorage wordStore;
 
 // ESP32 Pin-Definitionen
 // Pin 16/17 sind Standard für Serial2 (DFPlayer)
-// Pin 34/35 sind gute Analog-Eingänge (ADC1), da sie kein WiFi-Interferenzen haben
-constexpr int EMF_PIN = 34;   // Analog In (ehemals A0)
-constexpr int SEED_PIN = 35;  // Offener Pin für Random Seed (ehemals A1)
+// Pin 34 ist ein geeigneter Analog-Eingänge (ADC1), da er keine WiFi-Interferenzen hat
+constexpr int EMF_PIN = 34;   // Analog In 
 constexpr byte RXPin = 16;
 constexpr byte TXPin = 17;
 
@@ -39,7 +38,6 @@ void serielleAusgabe(int Idx, int data);
 void setup() {
   // ESP32 nutzt 12-Bit Auflösung (0-4095), wir kalibrieren den Seed
   analogReadResolution(12);
-  randomSeed(analogRead(SEED_PIN) + micros());
 
   Serial.begin(115200);
   delay(1000);  // Zeit für Serial Monitor
@@ -47,7 +45,7 @@ void setup() {
   // LCD Initialisierung (über Noiasca oder LiquidCrystal_I2C)
   InitLCDGerman();
   lcd.setCursor(0, 0);
-  lcd.print("PARA-METER 3.0");
+  lcd.print("PARA-METER 3.01");
   lcdZeile2("Initialisieren");
 
   // DFPlayer initialisieren
