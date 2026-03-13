@@ -23,3 +23,8 @@ As it is not mandatory to put category names in front of the string you may do s
 
 It may be helpful to clear the SD Card before uploading the folders with V3.0 compatible sound files to avoid conflicts.
 
+# Updates:
+
+V3.01 dated 2026/03/13
+* para-meter_V3_ESP.ino: Removed remains from earlier versions
+* WordPlayer.h: Changes to the WordPlayer init() function to achiev a stabel initialization with more than 3000 files/folders
