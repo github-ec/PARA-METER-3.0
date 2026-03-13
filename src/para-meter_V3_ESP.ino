@@ -1,6 +1,6 @@
 /* 
  * DIY "PARA"-METER SYSTEM (ESP32 EDITION)
- * Version 3.01 mit Hardware-Serial & ADC-Optimierung
+ * Version 3.02 mit Hardware-Serial & ADC-Optimierung
  * Datum: 2026/03/13
  */
 
@@ -19,7 +19,7 @@ WordStorage wordStore;
 // ESP32 Pin-Definitionen
 // Pin 16/17 sind Standard für Serial2 (DFPlayer)
 // Pin 34 ist ein geeigneter Analog-Eingänge (ADC1), da er keine WiFi-Interferenzen hat
-constexpr int EMF_PIN = 34;   // Analog In 
+constexpr int EMF_PIN = 34;  // Analog In
 constexpr byte RXPin = 16;
 constexpr byte TXPin = 17;
 
@@ -45,14 +45,14 @@ void setup() {
   // LCD Initialisierung (über Noiasca oder LiquidCrystal_I2C)
   InitLCDGerman();
   lcd.setCursor(0, 0);
-  lcd.print("PARA-METER 3.01");
+  lcd.print("PARA-METER 3.02");
   lcdZeile2("Initialisieren");
 
   // DFPlayer initialisieren
   wordPlayer.init(RXPin, TXPin);
   wordPlayer.messagesOff();
 
-  Serial.println(F("\n--- PARA-METER DIY GESTARTET (ESP32) ---"));
+  Serial.println("\n--- PARA-METER DIY GESTARTET (ESP32) ---");
   Serial.printf("Warte auf EMF-Ausschlag an Pin %d...\n", EMF_PIN);
 
   lcd.setCursor(0, 1);
@@ -62,20 +62,21 @@ void setup() {
 
 void loop() {
   int currentRead = analogRead(EMF_PIN);
-
-  // Alle 3 Sekunden bei Schwellenwert reagieren
+  // Alle 3 Sekunden bei Schwellenwert reagieren, wenn der Player "ready" ist
   // Hinweis: 250 auf 8-Bit (Arduino) entspricht ca. 1000 auf 12-Bit (ESP32)
+  if (!wordPlayer.isReady()) {
+    lastTime = millis();
+  }
   if (millis() - lastTime > 3000) {
     if (currentRead > 800) {  // Schwellenwert angepasst für ESP32 ADC
-      lastTime = millis();
-
       if (wordStore.wordFromData(currentRead)) {
-        int cat = wordStore.katID()+1;
-        int idx = wordStore.wordIndex()+1;
+        int cat = wordStore.katID() + 1;
+        int idx = wordStore.wordIndex() + 1;
         serielleAusgabe(currentRead);
         lcdWortAusgabe();
-        wordPlayer.playTitle(cat,idx);
+        wordPlayer.playTitle(cat, idx);
       }
+      lastTime = millis();
     }
   }
 
