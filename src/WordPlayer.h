@@ -1,7 +1,10 @@
 #pragma once
-// Version 3.01 dated 2026/03/13 
-// ec2021  
+
+// Version 3.02 dated 2026/03/13
+// ec2021
 #include <Arduino.h>
+
+
 #include "DFRobotDFPlayerMini.h"
 
 class wordPlayerClass {
@@ -16,10 +19,10 @@ private:
 
 public:
   wordPlayerClass();
-  
+
   // Wir übergeben die Pins jetzt hier direkt an die init-Funktion
   void init(int rx, int tx);
-  
+
   void handlePlayerStatus();
   void playTitle(int value);
   void playTitle(int cat, int wordNo);
@@ -35,7 +38,7 @@ public:
 };
 
 wordPlayerClass::wordPlayerClass() {
-  _serialPtr = &Serial2; // ESP32 Hardware Serial 2
+  _serialPtr = &Serial2;  // ESP32 Hardware Serial 2
 }
 
 void wordPlayerClass::init(int rx, int tx) {
@@ -63,7 +66,7 @@ void wordPlayerClass::init(int rx, int tx) {
   // Schleife läuft, bis Dateien gefunden werden oder Timeout (hier 10s)
   // Das Zeichen | wird vor, der Punkt . nach Aufruf readFileCounts() ausgegeben,
   // damit lässt sich erkennen, ob das Programm bei readFileCounts() hängen bleibt
-  while (fileCount == -1 && (millis() - startWait < 10000)) {
+  while (fileCount == -1 && (millis() - startWait < 30000)) {
     Serial.print('|');
     fileCount = myDFPlayer.readFileCounts();
     delay(1000);  // Der Player-Library Zeit zur Verarbeitung zu geben ...
@@ -90,13 +93,27 @@ void wordPlayerClass::init(int rx, int tx) {
 
 // ... (Rest der Funktionen bleibt identisch)
 
-bool wordPlayerClass::initFailed() { return _initFailed; }
-void wordPlayerClass::setReady(bool value) { _ready = value; }
-bool wordPlayerClass::isReady() { return _ready && !_initFailed; }
-bool wordPlayerClass::isPlaying() { return _doesPlay; }
-void wordPlayerClass::messagesOn() { _verbose = true; }
-void wordPlayerClass::messagesOff() { _verbose = false; }
-void wordPlayerClass::setVolume(byte value) { myDFPlayer.volume(value); }
+bool wordPlayerClass::initFailed() {
+  return _initFailed;
+}
+void wordPlayerClass::setReady(bool value) {
+  _ready = value;
+}
+bool wordPlayerClass::isReady() {
+  return _ready && !_initFailed;
+}
+bool wordPlayerClass::isPlaying() {
+  return _doesPlay;
+}
+void wordPlayerClass::messagesOn() {
+  _verbose = true;
+}
+void wordPlayerClass::messagesOff() {
+  _verbose = false;
+}
+void wordPlayerClass::setVolume(byte value) {
+  myDFPlayer.volume(value);
+}
 
 bool wordPlayerClass::playingTitle(int value) {
   playTitle(value);
@@ -119,7 +136,7 @@ void wordPlayerClass::playTitle(int value) {
 
 void wordPlayerClass::playTitle(int cat, int wordNo) {
   if (_initFailed) return;
-   myDFPlayer.playFolder(cat, wordNo);
+  myDFPlayer.playFolder(cat, wordNo);
   _doesPlay = true;
   _ready = false;
 }
@@ -131,8 +148,8 @@ void wordPlayerClass::handlePlayerStatus() {
     int value = myDFPlayer.read();
     printDetail(type, value);
     if (type == DFPlayerPlayFinished) {
-        _doesPlay = false;
-        _ready = true;
+      _doesPlay = false;
+      _ready = true;
     }
   }
 }
