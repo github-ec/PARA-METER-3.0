@@ -38,25 +38,53 @@ wordPlayerClass::wordPlayerClass() {
 
 void wordPlayerClass::init(int rx, int tx) {
   _ready = false;
-  _initFailed = false;
-  
+  _initFailed = true;
+
   // Die Pins werden erst hier beim Start der Hardware-Schnittstelle gesetzt
   _serialPtr->begin(9600, SERIAL_8N1, rx, tx);
-  
   delay(500);
-
-  if (!myDFPlayer.begin(*_serialPtr)) {
+  bool isAck = false;
+  bool doReset = true;
+  // myDFPlayer.begin(serialPort, isACK, doReset);
+  // 1. Parameter: Zeiger auf SoftwareSerial
+  // 2. Parameter: false = keine Bestätigung vom Player abfordern, wenn ein Befehl abgearbeitet wird; true = Bestätigung abfordern
+  // 3. Parameter: true = mit begin() ein Software-Reset des Players durchführen; false = kein Reset durchführen
+  _initFailed = !myDFPlayer.begin(*_serialPtr, isAck, doReset);
+  if (_initFailed) {
     Serial.println(F("DFPlayer init failed!"));
-    _initFailed = true;
     return;
   }
-  
+  //************************************************************************
+  Serial.print("\nWarte auf Dateisystem-Scan ");
+  int fileCount = -1;
+  unsigned long startWait = millis();
+  // Schleife läuft, bis Dateien gefunden werden oder Timeout (hier 10s)
+  // Das Zeichen | wird vor, der Punkt . nach Aufruf readFileCounts() ausgegeben,
+  // damit lässt sich erkennen, ob das Programm bei readFileCounts() hängen bleibt
+  while (fileCount == -1 && (millis() - startWait < 10000)) {
+    Serial.print('|');
+    fileCount = myDFPlayer.readFileCounts();
+    delay(1000);  // Der Player-Library Zeit zur Verarbeitung zu geben ...
+    Serial.print(".");
+  }
+  if (fileCount != -1) {
+    Serial.print("\nPlayer bereit: Anzahl Dateien auf SD: ");
+    Serial.println(fileCount);
+  } else {
+    Serial.println("\nTimeout: Player antwortet nicht auf Datenabfragen.");
+    _initFailed = false;
+    return;
+  }
+
+  //************************************************************************
+
   myDFPlayer.setTimeOut(500);
   myDFPlayer.volume(20);
   myDFPlayer.EQ(DFPLAYER_EQ_NORMAL);
   myDFPlayer.outputDevice(DFPLAYER_DEVICE_SD);
   _ready = true;
 }
+
 
 // ... (Rest der Funktionen bleibt identisch)
 
