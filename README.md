@@ -30,6 +30,6 @@ V3.01 dated 2026/03/13
 * WordPlayer.h: Changes to the WordPlayer init() function to achieve a stabel initialization with more than 3000 files/folders
 
 V3.02 dated 2026/03/13
-* para-meter_V3_ESP.ino: Use !wordPlayerisReady() to set lastTime to millis() to avoid too early choice of a new word
+* para-meter_V3_ESP.ino: Use if(!wordPlayer.isReady()){} to set lastTime to millis() to avoid too early choice of a new word
 * WordPlayer.h: Changed the timeout in WordPlayer init() to 30 seconds. The Player requires about 15 to 16 seconds to scan an SD Card with 25245 files
 
